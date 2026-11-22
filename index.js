@@ -1,9 +1,12 @@
 async function fetchProducts() {
+    const productsDiv = document.getElementById('products-list');
+    productsDiv.textContent = 'Завантаження товарів...';
+
     try {
         const res = await fetch('https://dummyjson.com/products');
         const data = await res.json();
 
-        document.getElementById('section-title').innerText = 'Усі товари';
+        document.getElementById('section-title').textContent = 'Усі товари';
         showProducts(data.products);
     } catch (error) {
         console.error('Помилка завантаження товарів:', error);
@@ -11,24 +14,17 @@ async function fetchProducts() {
 }
 
 async function fetchProductsByCategory(categorySlug, categoryName) {
+    const productsDiv = document.getElementById('products-list');
+    productsDiv.textContent = 'Завантаження товарів...';
+
     try {
-        const res = await fetch(`https://dummyjson.com/products/category/${categorySlug}`);
+        const res = await fetch('https://dummyjson.com/products/category/' + categorySlug);
         const data = await res.json();
 
-        document.getElementById('section-title').innerText = `Категорія: ${categoryName}`;
+        document.getElementById('section-title').textContent = 'Категорія: ' + categoryName;
         showProducts(data.products);
     } catch (error) {
         console.error('Помилка завантаження категорії:', error);
-    }
-}
-
-async function fetchProductById(id) {
-    try {
-        const res = await fetch(`https://dummyjson.com/products/${id}`);
-        const product = await res.json();
-        console.log(product);
-    } catch (error) {
-        console.error('Помилка завантаження товару:', error);
     }
 }
 
@@ -49,12 +45,15 @@ function showCategories(categoriesArray) {
 
     for (let i = 0; i < categoriesArray.length; i++) {
         const category = categoriesArray[i];
+        const btn = document.createElement('button');
 
-        categoriesDiv.innerHTML += `
-            <button class="category-btn" onclick="fetchProductsByCategory('${category.slug}', '${category.name}')">
-                ${category.name}
-            </button>
-        `;
+        btn.className = 'cat-btn';
+        btn.textContent = category.name;
+        btn.onclick = function () {
+            fetchProductsByCategory(category.slug, category.name);
+        };
+
+        categoriesDiv.appendChild(btn);
     }
 }
 
@@ -65,19 +64,15 @@ function showProducts(productsArray) {
     for (let i = 0; i < productsArray.length; i++) {
         const product = productsArray[i];
 
-        productsDiv.innerHTML += `
-            <div class="product-card">
-                <div>
-                    <img src="${product.thumbnail}" alt="${product.title}">
-                    <h3>${product.title}</h3>
-                    <p class="product-category">Категорія: ${product.category}</p>
-                </div>
-                <p class="product-price">$${product.price}</p>
-            </div>
-        `;
+        productsDiv.innerHTML +=
+            '<div class="card">' +
+                '<img src="' + product.thumbnail + '" alt="' + product.title + '">' +
+                '<h3>' + product.title + '</h3>' +
+                '<p class="card-cat">Категорія: ' + product.category + '</p>' +
+                '<p class="card-price">$' + product.price + '</p>' +
+            '</div>';
     }
 }
-
 
 fetchCategories();
 fetchProducts();
